@@ -1,0 +1,70 @@
+# Import Pacakges 
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import cross_val_score
+
+# Import Dataset
+df = pd.read_csv("ccdefault.csv")
+
+# QUick EDA
+print(df.head())
+print(df.describe())
+df.shape
+
+y = df.iloc[0:,24]
+X = df.iloc[0:,1:24]
+
+# Part 1
+# Decision Tree
+l_range = range(1,11)
+scores_out = []
+scores_in = []
+
+for l in l_range:
+    dt = DecisionTreeClassifier(max_depth = 3, random_state = l)
+    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size = 0.1,random_state = l)
+    dt.fit(X_train,y_train)
+    # Out of Sample
+    y_pred_tree = dt.predict(X_test)
+    scores_out.append(accuracy_score(y_test,y_pred_tree))
+    # In-sample
+    y_pred_tree = dt.predict(X_train)
+    scores_in.append(accuracy_score(y_train,y_pred_tree))
+    
+
+print("In-sample accuracy score: " + str(scores_in))
+print("Mean of the in-samples scores: " + str(np.mean(scores_in)))
+print("Standard Deviation of the in-sample scores: " + str(np.std(scores_in)))
+
+print("\n")
+
+print("Out of sample accuracy score: " + str(scores_out))
+print("Mean of the out of samples scores: " + str(np.mean(scores_out)))
+print("Standard Deviation of the out of sample scores: " + str(np.std(scores_out)))
+
+# Part 2
+
+scores_in = cross_val_score(estimator=dt,X=X_train,y=y_train,cv=10,n_jobs=1)
+print('CV accuracy scores in-sample: %s' % scores_in)
+print("Mean of the in-sample scores: " + str(np.mean(scores_in)))
+print("Standard Deviation of the in-sample scores: " + str(np.std(scores_in)))
+print("\n")
+
+# Out of sanple
+scores_out = cross_val_score(estimator=dt,X=X_test,y=y_test,cv=10,n_jobs=1)
+print('CV accuracy scores out of sample: %s' % scores_out)
+print("Mean of the out of sample scores: " + str(np.mean(scores_out)))
+print("Standard Deviation of the out of samples scores: " + str(np.std(scores_out)))
+
+print("My name is Timothee Becker")
+print("My NetID is: tbecker5")
+print("I hereby certify that I have read the University policy on Academic Integrity and that I am not in violation.")
